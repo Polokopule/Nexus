@@ -54,29 +54,29 @@
       transition: opacity 0.3s ease;
     }
     .card{
-	width:257px;
+	width:250px;
 	height:auto;
 	border-radius:10px;
 	background:#fff;
 	padding:10px;
 	display: flex;
 	flex-direction: column;
-	gap:10px;
+	gap:5px;
 	position: relative;
 	color:#000;
 	overflow: hidden;
 }
 .cardText{
-	width: 257px;
-	height: 200px;
+	width: 250px;
+	height: 150px;
 	background:#f2f2f2;
 	border-radius:10px;
 	overflow:hidden;
 }
 
  iframe {
-            width: 257px;
-            height: 200px;
+            width: 250px;
+            height: 150px;
             overflow:hidden;
         }
 .card  > .flex >  a{
@@ -125,18 +125,21 @@
 	width:90%;
 	height:auto;
 	padding:10px;
-	display: flex;
+	
 	background: #fff;
 	z-index:1;
 	border-radius:10px;
 	box-shadow:0 0 10px rgba(0,0,0,0.4);
 }
-.nav > span{
+.nav > div{
+	display: flex;
+}
+.nav > div >  span{
 	padding:10px;
 	font-size:18px;
 	font-weight: 300;
 	width:210px;
-}.nav > a{
+}.nav > div > a{
 	padding: 5px;
 	display:flex;
 		flex-direction: column;
@@ -154,12 +157,15 @@ body{
 
 .grid{
 	display: flex;
-	margin-top:30%;
-		flex-direction: column;
-	align-items: center;
+	margin-top:40%;
+	flex-direction: column-reverse;
 	color:#fff;
-	gap:10px;
+	gap:9px;
 height:auto;
+align-items: center;
+width:100%;
+
+
 }
 .share{
 	display: none;
@@ -217,14 +223,75 @@ height:auto;
     input[type="submit"]:hover {
       background-color: #45a049;
     }
+    input{
+    	outline: none;
+    }
+    .nav > input {
+    	border:1px solid #D188CC;
+    }
+    .loading {
+ --speed-of-animation: 0.9s;
+ --gap: 6px;
+ --first-color: #4c86f9;
+ --second-color: #fff;
+ --third-color: #fff;
+ --fourth-color: #fff;
+ --fifth-color: #fff;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ width: 100px;
+ gap: 6px;
+ height: 10px;
+}
+
+.loading span {
+ width: 4px;
+ height: 50px;
+ background: var(--first-color);
+ animation: scale var(--speed-of-animation) ease-in-out infinite;
+}
+
+.loading span:nth-child(2) {
+ background: var(--second-color);
+ animation-delay: -0.8s;
+}
+
+.loading span:nth-child(3) {
+ background: var(--third-color);
+ animation-delay: -0.7s;
+}
+
+.loading span:nth-child(4) {
+ background: var(--fourth-color);
+ animation-delay: -0.6s;
+}
+
+.loading span:nth-child(5) {
+ background: var(--fifth-color);
+ animation-delay: -0.5s;
+}
+
+@keyframes scale {
+ 0%, 40%, 100% {
+  transform: scaleY(0.05);
+ }
+
+ 20% {
+  transform: scaleY(1);
+ }
+}
     </style>
 </head>
 <body>
 
 <div class="nav">
-    <span>Nexus</span>
-    <a href="#share">share</a>
+   <div> <span>Nexus</span>
+    <a href="#share">share</a></div>
+      <input type="text" id="searchInput" placeholder="Search by title">
+
   </div>
+  
 <div class="share" id="share">
     <div class="form">
         <div class="container">
@@ -263,7 +330,17 @@ height:auto;
   <!-- Toast Notification -->
   <div class="toast" id="toast">File Uploaded Successfully!</div>
 <div class="grid" id='grid'>
-    <b id='load'>Loading NexusNode....</b>
+	
+	
+	 <b id='load'>Loading NexusNode....</b>
+	<div class="loading" id='spin'>
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+  <span></span>
+</div>
+   
 </div>
 <script>
     const firebaseConfig = {
@@ -346,21 +423,18 @@ height:auto;
             'download': title
         });
         $('#load').hide();
+        $('#spin').hide();
 var html =`<div class="card">
 <div class="cardText">
 	<iframe src="${url}" frameborder="0" disabled></iframe>
 	</div>
-<b>${title} </b>
+<b style="font-size:12px;">${title} </b>
 published by: ${username}
 	<div class='flex'>
 	<a href="${url}">Demo</a>
 		<a href="${url}" download='${url}'>Download</a>
-		<a href="#${id}">Profile</a></div>
-	<div class='byuser' id="${id}">
-		<div class="info">
-			<h1 style='font-weight:300;'> ${username}</h1>
-			<a href='${link}'>Follow Me</a>
-		</div></div>
+	</div>
+
 </div>`;
       
         $('#grid').append(html);
@@ -368,6 +442,24 @@ published by: ${username}
     
 };
     getFiles();
+    
+    // Function to handle search based on title
+const handleSearch = () => {
+    const searchText = $('#searchInput').val().toLowerCase(); // Get search text and convert to lowercase for case-insensitive comparison
+
+    // Loop through each card and check if the title contains the search text
+    $('.card').each(function() {
+        const cardTitle = $(this).find('b').text().toLowerCase(); // Get the title of the current card
+        if (cardTitle.includes(searchText)) {
+            $(this).show(); // Show the card if the title matches the search text
+        } else {
+            $(this).hide(); // Hide the card if the title does not match the search text
+        }
+    });
+};
+
+// Event listener for input change in the search field
+$('#searchInput').on('input', handleSearch);
 </script>
 </body>
-</html>
+	</html
