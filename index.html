@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <!-- Firebase Storage -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <!-- Firebase Database -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <title>Unite</title>
+    <!-- Your existing CSS styles -->
+    <style>
+        /* Your existing CSS styles */
+        /* ... */
+        
+        .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+    .loading-spinner {
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 4px solid #fff;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .toast {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 20px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .card{
+	width:257px;
+	height:auto;
+	border-radius:10px;
+	background:#fff;
+	padding:10px;
+	display: flex;
+	flex-direction: column;
+	gap:10px;
+	position: relative;
+	color:#000;
+	overflow: hidden;
+}
+.cardText{
+	width: 257px;
+	height: 200px;
+	background:#f2f2f2;
+	border-radius:10px;
+	overflow:hidden;
+}
+
+ iframe {
+            width: 257px;
+            height: 200px;
+            overflow:hidden;
+        }
+.card  > .flex >  a{
+	width: 70px;
+	text-align: center;
+	padding:10px;
+	background:#fff;
+	text-decoration: none;
+	box-shadow:0 0 5px rgba(0,0,0,0.4);
+	border-radius: 5px;
+	color:#000;
+}
+.flex{
+	display: flex;
+	gap:6px;
+}
+.flex > a:first-child{
+    background:#D188CC;
+    color:#fff;
+}
+.byuser{
+	display: none;	
+}
+.info{
+	position: absolute;
+	top:0;
+	left:0;
+	width:300px;
+	height:350px;
+	background:#fff;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	color:#000;
+	justify-content: center;
+
+}
+
+.byuser:target{
+	display: block;
+}
+.nav {
+	position: fixed;
+	top:10px;
+	left:;
+	width:90%;
+	height:auto;
+	padding:10px;
+	display: flex;
+	background: #fff;
+	z-index:1;
+	border-radius:10px;
+	box-shadow:0 0 10px rgba(0,0,0,0.4);
+}
+.nav > span{
+	padding:10px;
+	font-size:18px;
+	font-weight: 300;
+	width:210px;
+}.nav > a{
+	padding: 5px;
+	display:flex;
+		flex-direction: column;
+	align-items: center;
+	color:#fff;
+	justify-content: center;
+border-radius:10px;
+text-decoration: none;
+	background:#C075C4;
+	
+}
+body{
+	background:#C075C4;
+}
+
+.grid{
+	display: flex;
+	margin-top:30%;
+		flex-direction: column;
+	align-items: center;
+	color:#fff;
+	gap:10px;
+height:auto;
+}
+.share{
+	display: none;
+	
+}
+.share:target{
+	display: block;
+}
+.form{
+	position:fixed;
+	top:0;
+	left:0;
+	width:100%;
+	height:100%;
+	background:rgba(0,0,0,0.5);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	z-index:1;
+	justify-content: center;
+
+} .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+      margin-top: 5px;
+    }
+    input[type="submit"] {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    </style>
+</head>
+<body>
+
+<div class="nav">
+    <span>Nexus</span>
+    <a href="#share">share</a>
+  </div>
+<div class="share" id="share">
+    <div class="form">
+        <div class="container">
+            <h2>Put Your code in a Bucket</h2>
+            
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                 <div class="form-group">
+                    <label for="username">Social Media Link:</label>
+                    <input type="text" id="link" name="link" required>
+                </div>
+                <div class="form-group">
+                    <label for="title">Title:</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="file">Upload File:</label>
+                    <input type="file" id="file" name="file" required>
+                </div>
+                <button type="submit">Submit</button><br>
+                <hr>
+                <i>app by Poloko Pule ©BD-School-2023</i>
+            </form>
+        </div>
+    </div>
+</div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">File Uploaded Successfully!</div>
+<div class="grid" id='grid'>
+    <b id='load'>Loading NexusNode....</b>
+</div>
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyCYlzqp4ohFgH-Nw1NdIIkKr4U3HX7xwls",
+        authDomain: "unite-3409c.firebaseapp.com",
+        projectId: "unite-3409c",
+        storageBucket: "unite-3409c.appspot.com",
+        messagingSenderId: "608397760209",
+        appId: "1:608397760209:web:96c7edde0c8d59e49b17f0"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    const storage = firebase.storage();
+    const database = firebase.database();
+
+     // Handle form submission
+    $('#uploadForm').on('submit', function(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        const username = $('#username').val();
+        const link = $('#link').val();
+        const title = $('#title').val();
+        const file = $('#file')[0].files[0];
+
+        const storageRef = storage.ref(file.name);
+        const uploadTask = storageRef.put(file);
+
+        uploadTask.on('state_changed',
+            (snapshot) => {
+                console.log('Uploading', (snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+            },
+            (error) => {
+                console.log('Error', error);
+                alert('Error uploading file: ' + error.message);
+            },
+            () => {
+                console.log('Upload successful');
+                alert('File uploaded successfully');
+                var id = Math.floor(Math.random()*100);
+                getFiles();
+                // Store file details in Firebase Realtime Database
+                database.ref('files').push({
+                    username: username,
+                    title: title,
+                    id:id,
+                    link:link,
+                    fileURL: storageRef.fullPath  // Store the file path in storage
+                });
+            }
+        );
+    });
+    const getFiles = () => {
+        database.ref('files').once('value')
+            .then((snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const fileData = childSnapshot.val();
+                    const storageRef = storage.ref(fileData.fileURL);
+                    storageRef.getDownloadURL().then((url) => {
+                        addFileToDOM(url, fileData.username, fileData.title,fileData.id,fileData.link);
+                    }).catch((error) => {
+                        console.log('Error', error);
+                        alert('Error retrieving file: ' + error.message);
+                    });
+                });
+            })
+            .catch((error) => {
+                console.log('Error', error);
+                alert('Error retrieving files: ' + error.message);
+            });
+    };
+
+    const addFileToDOM = (url, username, title,id,link) => {
+        const fileCard = $('<div>').addClass('file-card');
+        const img = $('<img>').attr('src', url);
+        const fileTitle = $('<h3>').text(title);
+        const fileUsername = $('<p>').text(`Username: ${username}`);
+        const downloadLink = $('<a>').text('Download').attr({
+            'href': url,
+            'download': title
+        });
+        $('#load').hide();
+var html =`<div class="card">
+<div class="cardText">
+	<iframe src="${url}" frameborder="0" disabled></iframe>
+	</div>
+<b>${title} </b>
+published by: ${username}
+	<div class='flex'>
+	<a href="${url}">Demo</a>
+		<a href="${url}" download='${url}'>Download</a>
+		<a href="#${id}">Profile</a></div>
+	<div class='byuser' id="${id}">
+		<div class="info">
+			<h1 style='font-weight:300;'> ${username}</h1>
+			<a href='${link}'>Follow Me</a>
+		</div></div>
+</div>`;
+      
+        $('#grid').append(html);
+   
+    
+};
+    getFiles();
+</script>
+</body>
+</html>
