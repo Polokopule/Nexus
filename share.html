@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shared Content</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 20px;
+        }
+        .card {
+            width: 80%;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .card iframe {
+            width: 100%;
+            height: 300px;
+            border: none;
+        }
+        .card h2, .card p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="sharedContent">
+    <h2>Shared Content</h2>
+    <div class="fileContent"></div>
+    <p><strong>Title:</strong> <span id="title"></span></p>
+    <p><strong>Username:</strong> <span id="username"></span></p>
+</div>
+
+<script>
+    // Function to retrieve URL parameters
+    function getUrlParameter(name) {
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+        const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        const results = regex.exec(location.search);
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Get URL parameters for URL, title, and username
+    const url = getUrlParameter('url');
+    const title = getUrlParameter('title');
+    const username = getUrlParameter('username');
+
+    // Display content in the shareable page
+    document.getElementById('title').textContent = title;
+    document.getElementById('username').textContent = username;
+
+    const fileContent = document.createElement('iframe');
+    fileContent.src = url;
+    document.querySelector('.fileContent').appendChild(fileContent);
+</script>
+
+  </body>
