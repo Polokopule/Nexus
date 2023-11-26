@@ -133,12 +133,13 @@
 }
 .nav > div{
 	display: flex;
+	gap:10px;
 }
 .nav > div >  span{
-	padding:10px;
+	padding:6px;
 	font-size:18px;
 	font-weight: 300;
-	width:210px;
+	width:208px;
 }.nav > div > a{
 	padding: 5px;
 	display:flex;
@@ -151,22 +152,26 @@ text-decoration: none;
 	background:#C075C4;
 	
 }
+.nav > div > label{
+	font-size: 9px;
+	padding:10px;
+	background:#000;
+	color:#fff;
+	border-radius: 10px;
+	
+}
 body{
 	background:#C075C4;
 }
-
 .grid{
-	display: flex;
-	margin-top:40%;
-	flex-direction: column-reverse;
-	color:#fff;
-	gap:9px;
-height:auto;
-align-items: center;
-width:100%;
-
-
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    margin-top:40%;
 }
+   
 .share{
 	display: none;
 	
@@ -283,11 +288,13 @@ width:100%;
 }
     </style>
 </head>
-<body>
+<body id='body'>
 
-<div class="nav">
+<div class="nav" id='nav'>
    <div> <span>Nexus</span>
-    <a href="#share">share</a></div>
+    <a href="#share">share</a>
+    
+  </div>
       <input type="text" id="searchInput" placeholder="Search by title">
 
   </div>
@@ -332,7 +339,7 @@ width:100%;
 <div class="grid" id='grid'>
 	
 	
-	 <b id='load'>Loading NexusNode....</b>
+	
 	<div class="loading" id='spin'>
   <span></span>
   <span></span>
@@ -343,7 +350,12 @@ width:100%;
    
 </div>
 <script>
-    const firebaseConfig = {
+	
+	//#390C43 dark mode
+	//dark nav #00
+	
+	
+	  const firebaseConfig = {
         apiKey: "AIzaSyCYlzqp4ohFgH-Nw1NdIIkKr4U3HX7xwls",
         authDomain: "unite-3409c.firebaseapp.com",
         projectId: "unite-3409c",
@@ -404,6 +416,8 @@ width:100%;
                     }).catch((error) => {
                         console.log('Error', error);
                         alert('Error retrieving file: ' + error.message);
+                        $("#load").empty();
+                        $('#load').append("Something went wrong...");
                     });
                 });
             })
@@ -422,19 +436,19 @@ width:100%;
             'href': url,
             'download': title
         });
-        $('#load').hide();
+       // $('#load').hide();
         $('#spin').hide();
-var html =`<div class="card">
-<div class="cardText">
-	<iframe src="${url}" frameborder="0" disabled></iframe>
-	</div>
-<b style="font-size:12px;">${title} </b>
-published by: ${username}
-	<div class='flex'>
-	<a href="${url}">Demo</a>
-		<a href="${url}" download='${url}'>Download</a>
-	</div>
-
+var html =`<div class="card" id="card_${id}"> <!-- Add an ID to identify each card -->
+    <div class="cardText">
+        <iframe src="${url}" frameborder="0" disabled></iframe>
+    </div>
+    <b style="font-size:12px;">${title}</b>
+    published by: ${username}
+    <div class='flex'>
+        <a href="${url}">Demo</a>
+        <a href="${url}" download='${url}'>Download</a>
+        <a href="#" onclick="shareCard(${id})">Share</a> <!-- Add a share button/link -->
+    </div>
 </div>`;
       
         $('#grid').append(html);
@@ -460,6 +474,27 @@ const handleSearch = () => {
 
 // Event listener for input change in the search field
 $('#searchInput').on('input', handleSearch);
+
+
+function shareCard(cardID) {
+    const card = $(`#card_${cardID}`);
+    const url = card.find('iframe').attr('src');
+    const title = card.find('b').text();
+    const username = card.find('.flex').text().trim();
+
+    const shareableLink = `polokopule.github.io/Nexus/share.html?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&username=${encodeURIComponent(username)}`;
+    // Replace 'YourWebsiteURL' with your actual website domain.
+
+    // Create a temporary input element to copy the shareable link to clipboard
+    const tempInput = document.createElement('input');
+    tempInput.value = shareableLink;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    alert('Shareable link copied to clipboard!');
+}
 </script>
 </body>
-	</html
+</html>
